@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login - BP Sugar App</title>
+  <style>
+    body {
+      background: light blue;
+      font-family: Arial, sans-serif;
+      background: url('https://www.8health.com/wp-content/uploads/2025/03/types-of-bp-monitor.png') no-repeat center center fixed;
+      background-size: cover;
+      background-position: center;
+    }
+    .container {
+      width: 300px;
+      margin: 100px auto;
+      align-items: right;
+      padding: 30px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      margin-left: 60%;
+    }
+    h2 {
+      text-align: center;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      box-sizing: border-box;
+      border-radius: 150px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: blue;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 150px;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    p {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Login</h2>
+    <form onsubmit="return loginUser()">
+      <input id="email" type="email" placeholder="Email" required>
+      <input id="password" type="password" placeholder="Password" required>
+      <button type="submit">Login</button>
+      <p>Don't have an account? <a href="Register.html">Register</a></p>
+    </form>
+  </div>
+
+  <script>
+    function loginUser() {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      if (email === "" || password === "") {
+        alert("Please enter both email and password!");
+        return false; // Stop form submit
+      }
+
+      alert("Login successful!");
+      window.location.href = "dashboard.html";
+      return false; // Stop form submit
+    }
+  </script>
+</body>
+</html>

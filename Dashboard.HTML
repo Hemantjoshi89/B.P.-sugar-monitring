@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Health Dashboard with Chart</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background: #f0f2f5;
+    }
+    header {
+      background: #0d6efd;
+      color: white;
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .card h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      color: #333;
+    }
+    .card p {
+      font-size: 24px;
+      margin: 0;
+      font-weight: bold;
+    }
+    .form-section {
+      margin-top: 40px;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background: #0d6efd;
+      border: none;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .alert {
+      margin-top: 20px;
+      padding: 15px;
+      background: #fff3cd;
+      border: 1px solid #ffeeba;
+      border-radius: 5px;
+    }
+    .chart-section {
+      margin-top: 40px;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1> Health Monitor Dashboard </h1>
+   
+  </header>
+
+  <div class="container">
+    <div class="grid">
+      <div class="card">
+        <h2>Latest BP</h2>
+        <p id="latest-bp">--/--</p>
+      </div>
+      <div class="card">
+        <h2>Latest Sugar</h2>
+        <p id="latest-sugar">--</p>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h2>Enter New Reading</h2>
+      <label for="systolic">Systolic BP:</label>
+      <input type="number" id="systolic" placeholder="e.g. 120">
+
+      <label for="diastolic">Diastolic BP:</label>
+      <input type="number" id="diastolic" placeholder="e.g. 80">
+
+      <label for="sugar">Sugar Level (mg/dL):</label>
+      <input type="number" id="sugar" placeholder="e.g. 95">
+
+      <button onclick="checkHealth()">Submit</button>
+
+      <div id="ai-alert" class="alert" style="display:none;"></div>
+    </div>
+
+    <div class="chart-section">
+      <h2>BP & Sugar Trend</h2>
+      <canvas id="healthChart" width="600" height="300"></canvas>
+    </div>
+  </div>
+
+  <script>
+    const systolicData = [];
+    const diastolicData = [];
+    const sugarData = [];
+    const labels = [];
+
+    const ctx = document.getElementById('healthChart').getContext('2d');
+    const healthChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Systolic BP',
+            data: systolicData,
+            borderColor: 'blue',
+            fill: false
+          },
+          {
+            label: 'Diastolic BP',
+            data: diastolicData,
+            borderColor: 'green',
+            fill: false
+          },
+          {
+            label: 'Sugar',
+            data: sugarData,
+            borderColor: 'red',
+            fill: false
+          }
+        ]
+      },
+      options: {
+        responsive: true
+      }
+    });
+
+    function checkHealth() {
+      const systolic = parseInt(document.getElementById('systolic').value);
+      const diastolic = parseInt(document.getElementById('diastolic').value);
+      const sugar = parseInt(document.getElementById('sugar').value);
+
+      if (isNaN(systolic) || isNaN(diastolic) || isNaN(sugar)) {
+        alert("Please enter valid readings.");
+        return;
+      }
+
+      // Update latest values
+      document.getElementById('latest-bp').innerText = `${systolic}/${diastolic}`;
+      document.getElementById('latest-sugar').innerText = `${sugar} mg/dL`;
+
+      // Add new data point to chart
+      const dateLabel = new Date().toLocaleTimeString();
+      labels.push(dateLabel);
+      systolicData.push(systolic);
+      diastolicData.push(diastolic);
+      sugarData.push(sugar);
+      healthChart.update();
+
+      // AI-based suggestion
+      let message = " All readings are normal.";
+
+      if (systolic > 130 || diastolic > 90) {
+        message = " High BP detected! Please consult your doctor.";
+      }
+      if (systolic < 90 || diastolic < 60) {
+        message = " Low BP detected! Monitor closely or consult your doctor.";
+      }
+      if (sugar > 125) {
+        message += "  High Sugar level detected! Consult your doctor.";
+      }
+      if (sugar < 70) {
+        message += "Low Sugar level detected! Eat something sweet and monitor.";
+      }
+
+      const alertBox = document.getElementById('ai-alert');
+      alertBox.innerText = message;
+      alertBox.style.display = "block";
+    }
+  </script>
+</body>
+</html>
